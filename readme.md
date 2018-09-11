@@ -1,6 +1,6 @@
 # files-list [![Build Status](https://travis-ci.org/chinanf-boy/files-list.svg?branch=master)](https://travis-ci.org/chinanf-boy/files-list)
 
-「 get path dir/child all file path 」
+「 get path dir/+child all file path 」
 
 ## Install
 
