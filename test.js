@@ -8,7 +8,7 @@ test('async: that repo path dir', async t => {
 
 test('async: that repo path test.js', async t => {
   let results = await m('./test.js');
-  t.true(results.length >= 10);
+  t.true(results.length === 1);
 });
 
 test('async: deep all', async t => {
@@ -28,5 +28,5 @@ test('sync: that repo path dir', t => {
 
 test('sync: that repo path test.js', t => {
   let results = m.sync('./test.js');
-  t.true(results.length >= 10);
+  t.true(results.length === 1);
 });

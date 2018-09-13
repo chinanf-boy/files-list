@@ -2,7 +2,7 @@ const fs = require('mz/fs');
 const path = require('path');
 
 // 0 check deep level
-// 1-1. if file, get dirname
+// 1-1. if file, get absname, just one file
 // 1-2. if dir, get dir/files array
 // 2. abs path
 // 3. if dir, search next dir
@@ -43,8 +43,8 @@ exports = module.exports = async function filesList(pathDir, opts) {
 
     if (await fs.lstat(pathDir).then(x => x.isFile())) {
       // 1-1
-      pathDir = path.dirname(pathDir);
-      input = await fs.readdir(pathDir, 'utf8').then(files => files); // 1-2
+      let absPath = path.resolve(pathDir);
+      output.push(absPath);
     } else {
       input = await fs.readdir(pathDir, 'utf8').then(files => files); // 1-2
     }
@@ -80,8 +80,8 @@ function sync(pathDir, opts) {
 
     if (fs.lstatSync(pathDir).isFile()) {
       // 1-1
-      pathDir = path.dirname(pathDir);
-      input = fs.readdirSync(pathDir, 'utf8'); // 1-2
+      let absPath = path.resolve(pathDir);
+      output.push(absPath);
     } else {
       input = fs.readdirSync(pathDir, 'utf8'); // 1-2
     }
