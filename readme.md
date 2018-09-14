@@ -57,16 +57,14 @@ const filesList = require('files-list');
 | Default: | `1`               |
 | Desc:    | how deep you want |
 
-### filesList.sync(path, [options])
+### ~~filesList.sync(path, [options])~~
 
-| name: | sync                |
-| ----- | ------------------- |
-| Type: | `function`          |
-| Desc: | same args, but sync |
+split the code
 
 ### cancat
 
 - [dirs-list](https://github.com/chinanf-boy/dirs-list) get dir path
+- [files-list-sync](https://github.com/chinanf-boy/files-list-sync) sync version
 
 ### Use by
 
