@@ -13,11 +13,13 @@ test('async: that repo path test.js', async t => {
 
 test('async: deep all', async t => {
   let results = await m('.', { deep: 'all' });
+  console.log(results.length);
   t.true(results.length > 12);
 });
 
 test('sync: deep all', t => {
   let results = m.sync('.', { deep: 'all' });
+  console.log(results.length);
   t.true(results.length > 12);
 });
 
