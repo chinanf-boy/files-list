@@ -16,3 +16,9 @@ test('async: deep all', async t => {
   console.log(results.length);
   t.true(results.length > 12);
 });
+
+test('async: deep all', async t => {
+  let results = await m('./test/md', { deep: 'all' });
+  console.log(results.length);
+  t.true(results.length === 10);
+});
