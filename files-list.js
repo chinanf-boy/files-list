@@ -15,8 +15,10 @@ const defaultOpts = {
   _currentDeep: 1,
 };
 
-const mergeOpts = opts =>
-  Object.assign(JSON.parse(JSON.stringify(defaultOpts)), opts);
+const mergeOpts = opts => {
+  let n = Object.assign(JSON.parse(JSON.stringify(defaultOpts)), opts);
+  return n;
+};
 
 const stopRun = opts => {
   if (opts.deep === 'all') {
@@ -38,22 +40,20 @@ const upDeep = opts => {
  */
 exports = module.exports = async function filesList(pathDir, opts) {
   opts = mergeOpts(opts);
-
   let hadPath = {}; // break Infinite loop
 
   async function symbolReal(p) {
     let real = await fs.realpath(p);
     let t = await fs.lstat(real);
-    hadPath[real] = true;
     return { t, real };
   }
 
   async function selfAndChild(path, options) {
     let { step, opts, output } = options;
-    let input = [];
+    let input;
     if (!hadPath[path]) {
       // self
-      hadPath[path] = true;
+
       let action = 0;
       let type = await fs.lstat(path);
       if (type.isFile()) {
@@ -78,12 +78,14 @@ exports = module.exports = async function filesList(pathDir, opts) {
 
       if (action === 1) {
         if (step === 'self') {
-          input = await fs.readdir(path, 'utf8').then(files => files);
+          input = (await fs.readdir(path, 'utf8').then(files => files)) || [];
+          hadPath[path] = true; // had check self
         } else {
-          await run(path, upDeep(opts), output);
+          await run(path, upDeep(opts), output); // children dir
         }
       } else if (action) {
         output.push(path);
+        hadPath[path] = true; // had add self path
       }
 
       return input;
@@ -105,7 +107,7 @@ exports = module.exports = async function filesList(pathDir, opts) {
       let absPath = path.join(pathDir, path_string); // 2
       await selfAndChild(absPath, { opts, output });
     }
-    return output; // 4-2
+    return Promise.resolve(output); // 4-2
   }
 
   return await run(pathDir, opts);
