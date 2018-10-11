@@ -1,5 +1,5 @@
-const fs = require('mz/fs');
 const path = require('path');
+const fs = require('mz/fs');
 
 // 0 check deep level
 // 1-1. if file, get absname, just one file
@@ -13,10 +13,11 @@ const path = require('path');
 const defaultOpts = {
   deep: 1,
   _currentDeep: 1,
+  ignore: ['.git', 'node_modules'],
 };
 
 const mergeOpts = opts => {
-  let n = Object.assign(JSON.parse(JSON.stringify(defaultOpts)), opts);
+  const n = Object.assign(JSON.parse(JSON.stringify(defaultOpts)), opts);
   return n;
 };
 
@@ -24,11 +25,11 @@ const stopRun = opts => {
   if (opts.deep === 'all') {
     return false;
   }
-  return +opts.deep < opts._currentDeep;
+  return Number(opts.deep) < opts._currentDeep;
 };
 
 const upDeep = opts => {
-  let n = Object.assign({}, opts);
+  const n = Object.assign({}, opts);
   n._currentDeep++;
   return n;
 };
@@ -40,52 +41,57 @@ const upDeep = opts => {
  */
 exports = module.exports = async function filesList(pathDir, opts) {
   opts = mergeOpts(opts);
-  let hadPath = {}; // break Infinite loop
+  const hadPath = {}; // Break Infinite loop
 
   async function symbolReal(p) {
-    let real = await fs.realpath(p);
-    let t = await fs.lstat(real);
+    const real = await fs.realpath(p);
+    const t = await fs.lstat(real);
     return { t, real };
   }
 
   async function selfAndChild(path, options) {
-    let { step, opts, output } = options;
+    const { step, opts, output } = options;
     let input;
     if (!hadPath[path]) {
-      // self
+      // Self
 
       let action = 0;
-      let type = await fs.lstat(path);
-      if (type.isFile()) {
-        // file
-        // 1-1
-        action = 2;
-      } else if (type.isDirectory()) {
-        // dir
-        action = 1;
-      } else if (type.isSymbolicLink) {
-        // link
-        let { t, real } = await symbolReal(path);
-        if (t.isDirectory()) {
-          // link dir
-          path = real;
-          action = 1;
-        } else {
-          // link file
+      try {
+        const type = await fs.lstat(path);
+        if (type.isFile()) {
+          // File
+          // 1-1
           action = 2;
+        } else if (type.isDirectory()) {
+          // Dir
+          action = 1;
+        } else if (type.isSymbolicLink) {
+          // Link
+          const { t, real } = await symbolReal(path);
+          if (t.isDirectory()) {
+            // Link dir
+            path = real;
+            action = 1;
+          } else {
+            // Link file
+            action = 2;
+          }
         }
+      } catch (err) {
+        return input;
       }
 
       if (action === 1) {
         if (step === 'self') {
           input = (await fs.readdir(path, 'utf8').then(files => files)) || [];
-          hadPath[path] = true; // had check self
+          input = input.filter(x => !opts.ignore.some(ig => ig === x));
+          hadPath[path] = true; // Had check self
         } else {
-          await run(path, upDeep(opts), output); // children dir
+          await run(path, upDeep(opts), output); // Children dir
         }
       } else if (action) {
         output.push(path);
-        hadPath[path] = true; // had add self path
+        hadPath[path] = true; // Had add self path
       }
 
       return input;
@@ -97,14 +103,14 @@ exports = module.exports = async function filesList(pathDir, opts) {
       // 0
       return Promise.resolve(output);
     }
-    let absPath = path.resolve(pathDir);
-    let input =
+    const absPath = path.resolve(pathDir);
+    const input =
       (await selfAndChild(absPath, { step: 'self', opts, output })) || [];
 
     while (input.length) {
-      //  children
-      let path_string = input.shift();
-      let absPath = path.join(pathDir, path_string); // 2
+      //  Children
+      const path_string = input.shift();
+      const absPath = path.join(pathDir, path_string); // 2
       await selfAndChild(absPath, { opts, output });
     }
     return Promise.resolve(output); // 4-2

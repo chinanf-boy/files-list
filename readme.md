@@ -51,15 +51,23 @@ const filesList = require('files-list');
 
 ##### deep
 
-| name:    | deep              |
-| -------- | ----------------- |
-| Type:    | `number`          | `string`{'all'} |
-| Default: | `1`               |
-| Desc:    | how deep you want |
+| name:    | deep                        |
+| -------- | --------------------------- |
+| Type:    | `number` \| `string`{'all'} |
+| Default: | `1`                         |
+| Desc:    | how deep you want           |
+
+##### ignore
+
+| name:    | ignore                     |
+| -------- | -------------------------- |
+| Type:    | `Array`                    |
+| Default: | `['.git', 'node_modules']` |
+| Desc:    | ignore Dir name you want   |
 
 ### ~~filesList.sync(path, [options])~~
 
-split the code
+split the code to [files-list-sync](https://github.com/chinanf-boy/files-list-sync)
 
 ### cancat
 
