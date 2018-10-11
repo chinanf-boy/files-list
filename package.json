@@ -1,6 +1,6 @@
 {
   "name": "files-list",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "get path dir/child all file path",
   "license": "MIT",
   "main": "dist/files-list.js",
