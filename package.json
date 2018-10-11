@@ -19,7 +19,7 @@
     "build": "microbundle build files-list.js",
     "precommit": "lint-staged",
     "pub": "npm run test && npm run npmUp && npm run git",
-    "npmUp": "npm version minor && npm publish",
+    "npmUp": "npm version patch && npm publish",
     "git": "git push && git push --tags"
   },
   "husky": {
